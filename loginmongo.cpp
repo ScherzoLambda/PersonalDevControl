@@ -120,7 +120,7 @@ void LoginWindow::onLoginButtonClicked()
         string hashedPassword = ModelTask::criptPassword(password);
         string logresult = API_Client.do_findOne(ModelTask::login_filter(username.toStdString(), hashedPassword), "users_1");
         if (logresult != nullDoc && checkresult(logresult, username.toStdString()) == 1) {
-            QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo"+QString::fromStdString(logresult));
+            QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo");
             emit loginSuccessful(QString::fromStdString(logresult));
             // Hide the login window (optional)
             this->hide();
