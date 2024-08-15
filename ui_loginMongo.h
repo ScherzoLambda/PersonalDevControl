@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'loginMongoNCAqhs.ui'
+** Form generated from reading UI file 'loginMongoQyWkvG.ui'
 **
-** Created by: Qt User Interface Compiler version 6.7.0
+** Created by: Qt User Interface Compiler version 6.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef LOGINMONGONCAQHS_H
-#define LOGINMONGONCAQHS_H
+#ifndef LOGINMONGOQYWKVG_H
+#define LOGINMONGOQYWKVG_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -39,7 +39,7 @@ public:
     {
         if (LoginTasks->objectName().isEmpty())
             LoginTasks->setObjectName("LoginTasks");
-        LoginTasks->resize(433, 200);
+        LoginTasks->resize(423, 200);
         LoginTasks->setStyleSheet(QString::fromUtf8("background-color: rgb(151, 115, 158);"));
         verticalLayout_2 = new QVBoxLayout(LoginTasks);
         verticalLayout_2->setObjectName("verticalLayout_2");
@@ -87,6 +87,7 @@ public:
         lineEdit_2 = new QLineEdit(LoginTasks);
         lineEdit_2->setObjectName("lineEdit_2");
         lineEdit_2->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);"));
+        lineEdit_2->setEchoMode(QLineEdit::EchoMode::Password);
 
         verticalLayout->addWidget(lineEdit_2);
 
@@ -140,4 +141,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // LOGINMONGONCAQHS_H
+#endif // LOGINMONGOQYWKVG_H

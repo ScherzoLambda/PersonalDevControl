@@ -18,6 +18,8 @@ public:
     void sendbtn_clicked();
     void clearbtn_clicked();
     void updateTime();
+    void updateTimeSpendLabel(QString time_spended_so_far);
+    void CalculateAndReplaceTimeSpend(QString time_spended_so_far_);
     void updateClock();
     void stopTimer();
     void startTimer();
@@ -28,8 +30,11 @@ public slots:
 private:
     Ui::PersonalDevControlClass *ui;
     QTimer* timer;
+    QElapsedTimer* elapsedTime;
     QTimer* timer2;
     int elapsedSeconds;
     MongoAPI API_Client;
     QString userInfo;
+    boolean locker_;
+    boolean fistTime;
 };

@@ -21,6 +21,9 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Header Files\api_mongo">
+      <UniqueIdentifier>{9111d7d8-9a61-4374-b14f-1a305d98d905}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="personaldevcontrol.qrc">
@@ -51,14 +54,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apimongo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ui_loginMongo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="apimongo.h">
+      <Filter>Header Files\api_mongo</Filter>
+    </ClInclude>
     <ClInclude Include="modelTask.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\api_mongo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

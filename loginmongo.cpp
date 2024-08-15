@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QMessageBox>
 #include <QFormLayout>
+
 LoginWindow::LoginWindow(QWidget* parent) :
     QFrame(parent),
     ui(new Ui::LoginTasks)
@@ -20,7 +21,12 @@ LoginWindow::~LoginWindow()
 {
     delete ui;
 }
-
+/*
+* @brief
+*   Checa resultado da request \n
+*
+*   Verifica se o email foi encontrado ou não.
+*/
 int LoginWindow::checkresult(const string& data_result, const string& valuate)
 {
 
@@ -34,6 +40,13 @@ int LoginWindow::checkresult(const string& data_result, const string& valuate)
     }
 }
 
+/*
+* @brief
+*   Captura evento de clique no botão "Registrar-se" \n
+*
+*   Abre dialogo com os campos necessarios para o registro.
+*   e efetua o registro.
+*/
 void LoginWindow::onRegisterButtonClicked()
 {
     // Criar um novo diálogo/modal para registro de usuário
@@ -108,31 +121,40 @@ void LoginWindow::onRegisterButtonClicked()
     registrationDialog.exec();
 }
 
+/*
+* @brief
+*   Captura evento de clique no botão "Login" \n 
+*   
+*   Verifica os campos de email e senha
+*   e efetua o login
+*/
 void LoginWindow::onLoginButtonClicked()
 {
-    // 
+     
     QString username = ui->lineEdit->text();
     QString password = ui->lineEdit_2->text();
     string nullDoc = " {\"document\":null}";
 
-    // For demonstration, let's assume any non-empty username and password is valid
-    if (!username.isEmpty() && !password.isEmpty()) {
+    
+    if ((!username.isNull() || !username.isEmpty()) && (password.isNull() || !password.isEmpty())) {
+        
         string hashedPassword = ModelTask::criptPassword(password);
         string logresult = API_Client.do_findOne(ModelTask::login_filter(username.toStdString(), hashedPassword), "users_1");
+        
         if (logresult != nullDoc && checkresult(logresult, username.toStdString()) == 1) {
-            QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo");
+            QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo " + username);
             emit loginSuccessful(QString::fromStdString(logresult));
             // Hide the login window (optional)
             this->hide();
         }
         else {
-            QMessageBox::warning(this, "Login Failed", "Invalid username or password" + QString::fromStdString(logresult));
+            //QMessageBox::warning(this, "Login Failed", "Invalid username or password" + QString::fromStdString(logresult));
+            QMessageBox::warning(this, "Login Failed", "Invalid username or password");
         }
         
-
     }
     else {
-        // Show error message
+        // Informando ao usuario que há campos vazios
         QMessageBox::warning(this, "Login Failed", "Há campos vazios");
     }
 }

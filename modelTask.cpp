@@ -1,6 +1,6 @@
 #include "modelTask.h"
 #include <QString>
-#include <QCryptographicHash>
+#include <QCryptographicHash>]
 
 using namespace std;
 
@@ -29,8 +29,9 @@ string ModelTask::document_user(const string& nome, const string& email, const s
 
 string ModelTask::document_task(const string& id, const string& tipo, const string& descricao, const string& total, const string& inicio, const string& fim)
 {   
-    string documento = ",\"document\":{\"id_usuario\": \"" + id + "\", \"tipo_task\": \"" + tipo + "\",\"desc_task\": \"" + descricao + 
-        "\",\"horas_gastas\": \"" + total + "\", \"hora_inicio\": \""+ inicio + ",\"hora_fim\": \"" + fim + "\" }";
+    //string documento = ",\"document\":{\"id_usuario\": \"" + id + "\", \"tipo_task\": \"" + tipo + "\",\"desc_task\": \"" + descricao + "\", \"horas_gastas\": \"" + total + "\", \"hora_inicio\": \""+ inicio + ", \"hora_fim\": \"" + fim + "\"}";
+    string documento = ",\"document\":{\"id_usuario\": \"" + id + "\", \"tipo_task\": \"" + tipo + "\",\"desc_task\": \"" + descricao + "\",\"horas_gastas\": \"" + total + "\"";
+    documento = documento + ", \"hora_inicio\": \"" + inicio + "\",\"hora_fim\": \"" + fim + "\"}";
     return documento;
 }
 
@@ -38,5 +39,11 @@ string ModelTask::login_filter(const string& email, const string& senha)
 {
     // Corpo da requisição
     string filter = " ,\"filter\":{\"email\":\""+ email +"\",\"senha\":\"" + senha + "\"}";
+    return filter;
+}
+string ModelTask::user_filter(const string& email)
+{
+    // Corpo da requisição
+    string filter = " ,\"filter\":{\"email\":\""+ email +"\"}";
     return filter;
 }

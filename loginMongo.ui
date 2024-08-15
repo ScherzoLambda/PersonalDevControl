@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>433</width>
+    <width>423</width>
     <height>200</height>
    </rect>
   </property>
@@ -79,6 +79,9 @@
         <widget class="QLineEdit" name="lineEdit_2">
          <property name="styleSheet">
           <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="echoMode">
+          <enum>QLineEdit::EchoMode::Password</enum>
          </property>
         </widget>
        </item>

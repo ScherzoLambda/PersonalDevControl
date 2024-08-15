@@ -8,7 +8,7 @@ using namespace std;
 MongoAPI::MongoAPI()
     : url("https://sa-east-1.aws.data.mongodb-api.com/app/data-glsin/endpoint/data/v1"),
     headers(nullptr),
-    body("{\"dataSource\":\"Cluster0\",\"database\":\"Server_DB\",\"collection\":\"base0\"}")
+    body("{\"dataSource\":\"Cluster0\",\"database\":\"Server_DB\",\"collection\":\"users_1\"}")
 {
     // Verifica se a inicialização do curl foi bem-sucedida
     if (!curl) {
