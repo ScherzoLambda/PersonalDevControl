@@ -1,0 +1,102 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/documentation.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'  
+      - 'docs/**'
+      - '.github/workflows/documentation.yml'
+
+jobs:
+  validate-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install markdown linter
+      run: npm install -g markdownlint-cli
+      
+    - name: Create markdownlint config
+      run: |
+        cat > .markdownlint.json << 'EOF'
+        {
+          "MD013": { "line_length": 120 },
+          "MD024": { "allow_different_nesting": true },
+          "MD033": false,
+          "MD041": false
+        }
+        EOF
+        
+    - name: Lint markdown files
+      run: |
+        if find . -name "*.md" | grep -q .; then
+          markdownlint . --config .markdownlint.json
+        else
+          echo "No markdown files found"
+        fi
+        
+    - name: Check for broken links
+      run: |
+        # Simple check for markdown links - could be enhanced with actual link checking
+        echo "## Documentation Status" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f README.md ]; then
+          echo "✅ README.md exists" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️  No README.md found - consider adding project documentation" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if find . -name "*.md" | grep -q .; then
+          echo "📝 Markdown files found:" >> $GITHUB_STEP_SUMMARY
+          find . -name "*.md" | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+        else
+          echo "📝 No documentation files found" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+  suggest-docs:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Generate documentation suggestions
+      run: |
+        echo "## Documentation Suggestions" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ ! -f README.md ]; then
+          echo "### Missing Documentation" >> $GITHUB_STEP_SUMMARY
+          echo "Consider adding the following documentation files:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **README.md** - Project overview, setup instructions, usage" >> $GITHUB_STEP_SUMMARY
+          echo "- **docs/BUILDING.md** - Detailed build instructions" >> $GITHUB_STEP_SUMMARY  
+          echo "- **docs/API.md** - API documentation for MongoAPI class" >> $GITHUB_STEP_SUMMARY
+          echo "- **docs/CONTRIBUTING.md** - Contribution guidelines" >> $GITHUB_STEP_SUMMARY
+          echo "- **CHANGELOG.md** - Version history and changes" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Suggested README.md Content" >> $GITHUB_STEP_SUMMARY
+        echo "Based on the codebase analysis:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- Project description: Personal Development Control application" >> $GITHUB_STEP_SUMMARY
+        echo "- Technologies: Qt 6.6.3, C++, MongoDB integration" >> $GITHUB_STEP_SUMMARY  
+        echo "- Features: Login system, task management, MongoDB connectivity" >> $GITHUB_STEP_SUMMARY
+        echo "- Build requirements: Qt 6.6.3, libcurl, Visual Studio/CMake" >> $GITHUB_STEP_SUMMARY

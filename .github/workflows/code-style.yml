@@ -1,0 +1,135 @@
+name: Code Style and Format
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+        
+    - name: Check C++ code formatting
+      run: |
+        # Create .clang-format file if it doesn't exist
+        if [ ! -f .clang-format ]; then
+          cat > .clang-format << 'EOF'
+        ---
+        Language: Cpp
+        BasedOnStyle: Google
+        AccessModifierOffset: -4
+        AlignAfterOpenBracket: Align
+        AlignConsecutiveAssignments: false
+        AlignConsecutiveDeclarations: false
+        AlignEscapedNewlines: Left
+        AlignOperands: true
+        AlignTrailingComments: true
+        AllowAllParametersOfDeclarationOnNextLine: true
+        AllowShortBlocksOnASingleLine: false
+        AllowShortCaseLabelsOnASingleLine: false
+        AllowShortFunctionsOnASingleLine: All
+        AllowShortIfStatementsOnASingleLine: true
+        AllowShortLoopsOnASingleLine: true
+        BinPackArguments: true
+        BinPackParameters: true
+        BreakBeforeBinaryOperators: None
+        BreakBeforeBraces: Attach
+        BreakBeforeInheritanceComma: false
+        BreakBeforeTernaryOperators: true
+        BreakConstructorInitializersBeforeComma: false
+        BreakConstructorInitializers: BeforeColon
+        BreakStringLiterals: true
+        ColumnLimit: 120
+        CommentPragmas: '^ IWYU pragma:'
+        CompactNamespaces: false
+        ConstructorInitializerAllOnOneLineOrOnePerLine: true
+        ConstructorInitializerIndentWidth: 4
+        ContinuationIndentWidth: 4
+        Cpp11BracedListStyle: true
+        DerivePointerAlignment: true
+        DisableFormat: false
+        FixNamespaceComments: true
+        IncludeBlocks: Preserve
+        IndentCaseLabels: true
+        IndentPPDirectives: None
+        IndentWidth: 4
+        IndentWrappedFunctionNames: false
+        KeepEmptyLinesAtTheStartOfBlocks: false
+        MaxEmptyLinesToKeep: 1
+        NamespaceIndentation: None
+        PointerAlignment: Left
+        ReflowComments: true
+        SortIncludes: true
+        SortUsingDeclarations: true
+        SpaceAfterCStyleCast: false
+        SpaceAfterTemplateKeyword: true
+        SpaceBeforeAssignmentOperators: true
+        SpaceBeforeCpp11BracedList: false
+        SpaceBeforeCtorInitializerColon: true
+        SpaceBeforeInheritanceColon: true
+        SpaceBeforeParens: ControlStatements
+        SpaceBeforeRangeBasedForLoopColon: true
+        SpaceInEmptyParentheses: false
+        SpacesBeforeTrailingComments: 2
+        SpacesInAngles: false
+        SpacesInContainerLiterals: true
+        SpacesInCStyleCastParentheses: false
+        SpacesInParentheses: false
+        SpacesInSquareBrackets: false
+        Standard: Auto
+        TabWidth: 4
+        UseTab: Never
+        EOF
+        fi
+        
+        # Check formatting for all C++ files except generated ones
+        find . -name "*.cpp" -o -name "*.h" | grep -v ui_ | xargs clang-format --dry-run --Werror
+        
+    - name: Suggest formatting fixes
+      if: failure()
+      run: |
+        echo "## Code Formatting Issues Found" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Run the following command to fix formatting:" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo 'find . -name "*.cpp" -o -name "*.h" | grep -v ui_ | xargs clang-format -i' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        
+  static-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install static analysis tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck clang-tidy
+        
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --suppress=missingIncludeSystem --xml --xml-version=2 \
+          --exclude=ui_loginMongo.h . 2> cppcheck-report.xml || true
+        
+    - name: Run clang-tidy (if available)
+      run: |
+        # This would require compilation database, so we'll skip for now
+        echo "Clang-tidy requires compilation database - skipping for now"
+        
+    - name: Upload static analysis results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: static-analysis-results
+        path: cppcheck-report.xml
