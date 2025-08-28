@@ -1,0 +1,62 @@
+name: Build Qt C++ App
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            libcurl4-openssl-dev \
+            pkg-config
+
+      - name: Set up Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.4.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          cache: true
+
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          echo "Qt6_DIR: $Qt6_DIR"
+          echo "CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$Qt6_DIR"
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config Release --verbose
+
+      - name: Test build artifacts
+        run: |
+          cd build
+          ls -la
+          ls -la bin/
+          # Check if executable was created
+          if [ -f ./bin/PersonalDevControl ]; then
+            echo "✅ PersonalDevControl executable created successfully"
+            file ./bin/PersonalDevControl
+          else
+            echo "❌ PersonalDevControl executable not found"
+            exit 1
+          fi

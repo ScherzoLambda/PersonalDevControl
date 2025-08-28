@@ -1,5 +1,5 @@
-#include "personaldevcontrol.h"
-#include "loginmongo.h"
+#include "ui/personaldevcontrol.h"
+#include "ui/loginmongo.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char* argv[])

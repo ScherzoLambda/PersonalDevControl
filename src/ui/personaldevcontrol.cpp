@@ -1,5 +1,5 @@
 #include "personaldevcontrol.h"
-#include "apimongo.h"
+#include "../core/apimongo.h"
 #include <QDateTime>
 #include <QTimer>
 
@@ -27,7 +27,7 @@ PersonalDevControl::~PersonalDevControl()
 }
 
 void PersonalDevControl::onLoginSuccessful(const QString& logresult) {
-    userInfo = logresult; // Armazena a informação do login
+    userInfo = logresult; // Armazena a informaï¿½ï¿½o do login
 }
 
 void PersonalDevControl::sendbtn_clicked()
