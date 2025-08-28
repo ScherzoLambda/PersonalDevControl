@@ -1,6 +1,6 @@
 #include "loginmongo.h"
-#include "apimongo.h"
-#include "modelTask.h"
+#include "../core/apimongo.h"
+#include "../models/modelTask.h"
 #include "ui_loginMongo.h"
 #include <iostream>
 #include <QMessageBox>
@@ -30,15 +30,15 @@ int LoginWindow::checkresult(const string& data_result, const string& valuate)
     }
     else {
         return 0;
-        //std::cout << "Email não encontrado." << std::endl;
+        //std::cout << "Email nï¿½o encontrado." << std::endl;
     }
 }
 
 void LoginWindow::onRegisterButtonClicked()
 {
-    // Criar um novo diálogo/modal para registro de usuário
+    // Criar um novo diï¿½logo/modal para registro de usuï¿½rio
     QDialog registrationDialog;
-    registrationDialog.setWindowTitle("Registro de Usuário");
+    registrationDialog.setWindowTitle("Registro de Usuï¿½rio");
     registrationDialog.setFixedSize(400, 150);
     registrationDialog.setStyleSheet("background-color: rgb(151, 115, 158);");
 
@@ -57,10 +57,10 @@ void LoginWindow::onRegisterButtonClicked()
     formLayout->addRow("Email:", emailEdit);
     formLayout->addRow("Senha:", passwordEdit);
 
-    // Adicionar botões de registro e cancelar
+    // Adicionar botï¿½es de registro e cancelar
     QPushButton* registerButton = new QPushButton("Registrar-se", &registrationDialog);
     QPushButton* cancelButton = new QPushButton("Cancelar", &registrationDialog);
-    // Definir a política de tamanho para que ambos os botões tenham o mesmo tamanho
+    // Definir a polï¿½tica de tamanho para que ambos os botï¿½es tenham o mesmo tamanho
     registerButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     cancelButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     registerButton->setStyleSheet("background-color: rgb(128,0,128);font-size: 14px;color:white;font-weight:bold;");
@@ -75,14 +75,14 @@ void LoginWindow::onRegisterButtonClicked()
     mainLayout->addLayout(formLayout);
     mainLayout->addLayout(buttonLayout);
     
-    // Conectar os cliques dos botões aos slots para processar o registro e o cancelamento
+    // Conectar os cliques dos botï¿½es aos slots para processar o registro e o cancelamento
     connect(registerButton, &QPushButton::clicked, [&]() {
         // Obter valores dos campos de entrada
         QString name = nameEdit->text();
         QString email = emailEdit->text();
         QString password = passwordEdit->text();
 
-        // Validar os dados (por exemplo, verificar se todos os campos estão preenchidos)
+        // Validar os dados (por exemplo, verificar se todos os campos estï¿½o preenchidos)
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
             QMessageBox::warning(&registrationDialog, "Erro", "Por favor, preencha todos os campos.");
             return;
@@ -95,7 +95,7 @@ void LoginWindow::onRegisterButtonClicked()
             registrationDialog.close();
         }
         else {
-            QMessageBox::information(&registrationDialog, "Falha na Operação", "Falha ao registar, tente novamente!");
+            QMessageBox::information(&registrationDialog, "Falha na Operaï¿½ï¿½o", "Falha ao registar, tente novamente!");
         }
 
     });
@@ -104,7 +104,7 @@ void LoginWindow::onRegisterButtonClicked()
     registrationDialog.setLayout(mainLayout);
     //formLayout->addRow(cancelButton, registerButton);
 
-    // Exibir o diálogo/modal de registro
+    // Exibir o diï¿½logo/modal de registro
     registrationDialog.exec();
 }
 
@@ -133,6 +133,6 @@ void LoginWindow::onLoginButtonClicked()
     }
     else {
         // Show error message
-        QMessageBox::warning(this, "Login Failed", "Há campos vazios");
+        QMessageBox::warning(this, "Login Failed", "Hï¿½ campos vazios");
     }
 }

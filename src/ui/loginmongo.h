@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_loginMongo.h"
-#include "apimongo.h"
+#include "../core/apimongo.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LoginTasks; }

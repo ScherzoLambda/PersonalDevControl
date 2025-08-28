@@ -1,5 +1,5 @@
 #pragma once
-#include "apimongo.h"
+#include "../core/apimongo.h"
 #include <QtWidgets/QMainWindow>
 #include "ui_personaldevcontrol.h"
 
