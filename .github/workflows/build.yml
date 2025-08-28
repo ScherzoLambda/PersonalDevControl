@@ -51,10 +51,11 @@ jobs:
         run: |
           cd build
           ls -la
+          ls -la bin/
           # Check if executable was created
-          if [ -f ./PersonalDevControl ]; then
+          if [ -f ./bin/PersonalDevControl ]; then
             echo "✅ PersonalDevControl executable created successfully"
-            file ./PersonalDevControl
+            file ./bin/PersonalDevControl
           else
             echo "❌ PersonalDevControl executable not found"
             exit 1
