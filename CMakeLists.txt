@@ -27,7 +27,7 @@ set(HEADERS
     src/ui/loginmongo.h
     src/core/apimongo.h
     src/models/modelTask.h
-    src/ui/ui_loginMongo.h
+    ui_loginMongo.h
 )
 
 # Process UI files manually since qt6_add_uic might not be available in older versions
@@ -56,6 +56,7 @@ target_link_libraries(PersonalDevControl PRIVATE
 
 # Include directories
 target_include_directories(PersonalDevControl PRIVATE
+    .                        # Root directory for ui_loginMongo.h
     src
     src/ui
     src/core

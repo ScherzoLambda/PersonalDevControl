@@ -2,9 +2,9 @@ name: Build Qt C++ App
 
 on:
   push:
-    branches: [main, master]
+    branches: ['**']
   pull_request:
-    branches: [main, master]
+    branches: ['**']
 
 jobs:
   build:
@@ -32,17 +32,20 @@ jobs:
           target: 'desktop'
           arch: 'gcc_64'
           modules: 'qtbase qtwidgets'
+          cache: true
 
       - name: Configure CMake
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+          echo "Qt6_DIR: $Qt6_DIR"
+          echo "CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$Qt6_DIR"
 
       - name: Build
         run: |
           cd build
-          cmake --build . --config Release
+          cmake --build . --config Release --verbose
 
       - name: Test build artifacts
         run: |
