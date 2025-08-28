@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
-find_package(CURL REQUIRED)
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
 set(SOURCES
         src/main.cpp
@@ -41,7 +42,8 @@ target_link_libraries(PersonalDevControl PRIVATE
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
-        CURL::libcurl
+        mongo::mongocxx_shared
+        mongo::bsoncxx_shared
 )
 
 target_include_directories(PersonalDevControl PRIVATE
