@@ -1,0 +1,217 @@
+name: Build and Test PersonalDevControl
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  QT_VERSION: 6.6.3
+  CMAKE_BUILD_TYPE: Release
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        config: [Debug, Release]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ env.QT_VERSION }}
+        host: windows
+        target: desktop
+        arch: win64_msvc2019_64
+        modules: 'qtbase qtwidgets'
+        setup-python: false
+        
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v2
+      
+    - name: Install vcpkg
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
+        
+    - name: Install dependencies via vcpkg
+      run: |
+        vcpkg install curl:x64-windows
+        
+    - name: Configure project
+      run: |
+        # Set environment variables for Qt and vcpkg
+        echo "Qt6_DIR=${{ env.Qt6_DIR }}" >> $GITHUB_ENV
+        echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
+        
+    - name: Build with MSBuild
+      run: |
+        msbuild PersonalDevControl.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64 /p:QtInstall="${{ env.Qt6_DIR }}" /m
+        
+    - name: Upload build artifacts
+      if: matrix.config == 'Release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: PersonalDevControl-Windows-${{ matrix.config }}
+        path: |
+          x64/${{ matrix.config }}/*.exe
+          x64/${{ matrix.config }}/*.dll
+          
+  build-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          pkg-config \
+          libcurl4-openssl-dev \
+          libssl-dev
+          
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ env.QT_VERSION }}
+        host: linux
+        target: desktop
+        modules: 'qtbase qtwidgets'
+        setup-python: false
+        
+    - name: Create CMakeLists.txt for Linux build
+      run: |
+        cat > CMakeLists.txt << 'EOF'
+        cmake_minimum_required(VERSION 3.16)
+        project(PersonalDevControl VERSION 1.0.0 LANGUAGES CXX)
+        
+        set(CMAKE_CXX_STANDARD 17)
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+        
+        find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+        find_package(PkgConfig REQUIRED)
+        find_package(CURL REQUIRED)
+        
+        qt6_standard_project_setup()
+        
+        set(SOURCES
+            main.cpp
+            personaldevcontrol.cpp
+            loginmongo.cpp
+            apimongo.cpp
+            modelTask.cpp
+        )
+        
+        set(HEADERS
+            personaldevcontrol.h
+            loginmongo.h
+            apimongo.h
+            modelTask.h
+            ui_loginMongo.h
+        )
+        
+        set(UI_FILES
+            personaldevcontrol.ui
+            loginMongo.ui
+        )
+        
+        set(RESOURCES
+            personaldevcontrol.qrc
+        )
+        
+        qt6_add_executable(PersonalDevControl ${SOURCES} ${HEADERS})
+        qt6_add_resources(PersonalDevControl "resources" FILES ${RESOURCES})
+        
+        if(UI_FILES)
+            qt6_add_resources(PersonalDevControl "ui_resources" FILES ${UI_FILES})
+        endif()
+        
+        target_link_libraries(PersonalDevControl 
+            Qt6::Core 
+            Qt6::Widgets 
+            ${CURL_LIBRARIES}
+        )
+        
+        target_include_directories(PersonalDevControl PRIVATE ${CURL_INCLUDE_DIRS})
+        
+        # Enable automatic MOC, UIC, and RCC processing
+        set_target_properties(PersonalDevControl PROPERTIES
+            AUTOMOC ON
+            AUTOUIC ON
+            AUTORCC ON
+        )
+        EOF
+        
+    - name: Configure with CMake
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }}
+        
+    - name: Build project
+      run: |
+        cmake --build build --config ${{ env.CMAKE_BUILD_TYPE }} --parallel
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: PersonalDevControl-Linux
+        path: |
+          build/PersonalDevControl
+          
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Run cppcheck
+      uses: deep5050/cppcheck-action@main
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        check_library: enable
+        skip_preprocessor: enable
+        enable: warning,style,performance,portability
+        exclude_check: ./ui_loginMongo.h
+        
+  create-release:
+    if: github.event_name == 'release'
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download Windows artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: PersonalDevControl-Windows-Release
+        path: ./windows-release/
+        
+    - name: Download Linux artifacts  
+      uses: actions/download-artifact@v4
+      with:
+        name: PersonalDevControl-Linux
+        path: ./linux-release/
+        
+    - name: Create release archives
+      run: |
+        cd windows-release && zip -r ../PersonalDevControl-Windows.zip .
+        cd ../linux-release && tar -czf ../PersonalDevControl-Linux.tar.gz .
+        
+    - name: Upload release assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          PersonalDevControl-Windows.zip
+          PersonalDevControl-Linux.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
