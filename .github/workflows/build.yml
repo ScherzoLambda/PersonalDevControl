@@ -31,7 +31,6 @@ jobs:
           host: 'linux'
           target: 'desktop'
           arch: 'gcc_64'
-          modules: 'qtbase qtwidgets'
           cache: true
 
       - name: Configure CMake
