@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include <QMessageBox>
 #include "apimongo.h"
 #include <bsoncxx/json.hpp>
@@ -17,10 +18,23 @@ using bsoncxx::builder::stream::finalize;
 mongocxx::instance MongoAPI::instance_{};
 
 MongoAPI::MongoAPI()
-    : client_(mongocxx::uri{"mongodb+srv://scherzolambda:wRbHAPKHJdgGaD5P@cluster0.oitlzz4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"}),
-      db_(client_["Server_DB"])
 {
     try {
+        // Get MongoDB URI from environment variable, fallback to default
+        const char* mongo_uri = std::getenv("MONGODB_URI");
+        std::string uri_string;
+        
+        if (mongo_uri) {
+            uri_string = mongo_uri;
+        } else {
+            // Default connection string for development (should be set via environment in production)
+            uri_string = "mongodb+srv://scherzolambda:wRbHAPKHJdgGaD5P@cluster0.oitlzz4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+            std::cout << "Warning: Using default MongoDB URI. Set MONGODB_URI environment variable for production." << std::endl;
+        }
+        
+        client_ = mongocxx::client{mongocxx::uri{uri_string}};
+        db_ = client_["Server_DB"];
+        
         // Test connection
         auto ping_cmd = bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp("ping", 1)
@@ -84,7 +98,8 @@ string MongoAPI::do_insert(const string& document, const string& collection) {
         // We need to extract just the document part
         
         std::string doc_json = document;
-        // Remove the leading comma and "document": wrapper
+        
+        // First, try to find the document object specifically
         size_t doc_start = doc_json.find("{\"nome\":");
         if (doc_start == std::string::npos) {
             doc_start = doc_json.find("{\"id_usuario\":");
@@ -107,8 +122,12 @@ string MongoAPI::do_insert(const string& document, const string& collection) {
                 }
             }
             doc_json = doc_json.substr(doc_start, doc_end - doc_start + 1);
+        } else {
+            std::cerr << "Could not find valid JSON in document: " << document << std::endl;
+            return "0";
         }
         
+        std::cout << "Parsed document JSON: " << doc_json << std::endl;
         auto doc = parseJsonToDocument(doc_json);
         auto result = coll.insert_one(doc.view());
         
@@ -167,8 +186,15 @@ string MongoAPI::do_findOne(const string& filter, const string& collection) {
         // Parse the filter string that comes in format like:
         // " ,\"filter\":{\"email\":\"test@test.com\",\"senha\":\"hashedpassword\"}"
         std::string filter_json = filter;
+        
+        // First, try to find the filter object specifically
         size_t filter_start = filter_json.find("{\"email\":");
         if (filter_start == std::string::npos) {
+            // Look for any other field patterns
+            filter_start = filter_json.find("{\"");
+        }
+        if (filter_start == std::string::npos) {
+            // Just look for the first opening brace
             filter_start = filter_json.find("{");
         }
         
@@ -185,8 +211,12 @@ string MongoAPI::do_findOne(const string& filter, const string& collection) {
                 }
             }
             filter_json = filter_json.substr(filter_start, filter_end - filter_start + 1);
+        } else {
+            // If no valid JSON found, create an empty filter to find any document
+            filter_json = "{}";
         }
         
+        std::cout << "Parsed filter JSON: " << filter_json << std::endl;
         auto filter_doc = parseJsonToDocument(filter_json);
         auto result = coll.find_one(filter_doc.view());
         

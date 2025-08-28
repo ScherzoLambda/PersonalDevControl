@@ -34,16 +34,26 @@ brew install qt@6 cmake
 
 ### 2. Dependências Externas
 
-#### libcurl (para API MongoDB)
+#### MongoDB C++ Driver (mongocxx)
 ```bash
-# Linux
-sudo apt install libcurl4-openssl-dev pkg-config
+# Linux - Build from source (recommended)
+# 1. Install prerequisites
+sudo apt install libmongoc-1.0-dev libbson-1.0-dev libssl-dev
+
+# 2. Download and build mongocxx
+wget https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.10.1/mongo-cxx-driver-r3.10.1.tar.gz
+tar -xzf mongo-cxx-driver-r3.10.1.tar.gz
+cd mongo-cxx-driver-r3.10.1
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+make -j4
+sudo make install
 
 # Windows (usando vcpkg)
-vcpkg install curl
+vcpkg install mongo-cxx-driver
 
 # macOS
-brew install curl
+brew install mongo-cxx-driver
 ```
 
 ## Configuração no CLion
@@ -168,13 +178,16 @@ Para adicionar testes unitários:
 set(CMAKE_PREFIX_PATH "/path/to/Qt/6.5.0/gcc_64")
 ```
 
-### libcurl não encontrado
+### MongoDB C++ Driver não encontrado
 ```bash
-# Linux - instalar dev package
-sudo apt install libcurl4-openssl-dev pkg-config
+# Linux - verificar instalação
+pkg-config --exists libmongocxx && echo "mongocxx found" || echo "mongocxx not found"
+
+# Se não encontrado, instalar manualmente:
+# Seguir instruções na seção de dependências externas
 
 # Windows - verificar vcpkg
-vcpkg list curl
+vcpkg list mongo-cxx-driver
 ```
 
 ### Erro de compilação com MOC

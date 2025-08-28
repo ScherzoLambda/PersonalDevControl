@@ -4,12 +4,31 @@
 
 PersonalDevControl é uma aplicação de controle pessoal de desenvolvimento construída em C++ usando Qt6 e CMake. A aplicação permite gerenciar tarefas de desenvolvimento pessoal com integração à API do MongoDB.
 
+## 🔄 Migração para MongoDB C++ Driver
+
+**Importante:** Esta aplicação foi migrada do MongoDB DataAPI (descontinuado em setembro de 2025) para o driver oficial **mongocxx**. Esta migração garante:
+
+- ✅ **Suporte de longo prazo**: Driver oficial mantido pela MongoDB Inc.
+- ✅ **Melhor performance**: Conexão direta sem overhead HTTP
+- ✅ **Maior segurança**: Conexão nativa com autenticação integrada
+- ✅ **API moderna**: Interface C++ nativa com suporte a BSON
+
+### Configuração do MongoDB
+
+Para usar a aplicação, configure a variável de ambiente `MONGODB_URI`:
+
+```bash
+export MONGODB_URI="mongodb+srv://username:password@cluster.mongodb.net/database"
+```
+
+Ou a aplicação usará a configuração padrão de desenvolvimento.
+
 ## 🚀 Funcionalidades
 
 - **Sistema de Login**: Autenticação de usuários via MongoDB
 - **Controle de Tempo**: Timer para acompanhar tempo gasto em tarefas
 - **Interface Qt6**: Interface moderna e responsiva
-- **API MongoDB**: Integração com banco de dados MongoDB via cURL
+- **API MongoDB**: Integração com banco de dados MongoDB via driver oficial mongocxx
 - **Multiplataforma**: Suporte para Linux, Windows e macOS
 
 ## 🛠️ Tecnologias
@@ -17,7 +36,7 @@ PersonalDevControl é uma aplicação de controle pessoal de desenvolvimento con
 - **C++17**: Linguagem principal
 - **Qt6**: Framework de interface gráfica
 - **CMake**: Sistema de build
-- **libcurl**: Cliente HTTP para API MongoDB
+- **mongocxx**: Driver oficial MongoDB C++ para acesso ao banco de dados
 - **MongoDB**: Banco de dados
 
 ## 📁 Estrutura do Projeto
@@ -124,7 +143,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 ## 🙏 Agradecimentos
 
 - Qt Framework pela excelente biblioteca de interface gráfica
-- MongoDB pela API robusta de banco de dados
+- MongoDB pelo driver oficial mongocxx e banco de dados robusto
 - Comunidade open source pelas ferramentas e bibliotecas utilizadas
 
 ---
