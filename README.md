@@ -1,4 +1,4 @@
-# PersonalDevControl
+# PersonalDevControl [Work in Progress]
 
 ![Build Status](https://github.com/ScherzoLambda/PersonalDevControl/workflows/Build%20Qt%20C++%20App/badge.svg)
 
@@ -40,6 +40,7 @@ Ou a aplicação usará a configuração padrão de desenvolvimento.
 - **MongoDB**: Banco de dados
 
 ## 📁 Estrutura do Projeto
+- - Sera alterado na proxima atualização
 
 ```
 PersonalDevControl/
@@ -90,32 +91,6 @@ cmake --build .
 ```bash
 ./PersonalDevControl
 ```
-
-## 🔧 Desenvolvimento
-
-### CLion Setup
-
-Para configurar o projeto no CLion, consulte o [setup.md](setup.md) que contém instruções detalhadas.
-
-### Build Manual
-
-```bash
-# Debug build
-mkdir build-debug
-cd build-debug
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake --build .
-
-# Release build
-mkdir build-release
-cd build-release
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-```
-
-## 🏗️ CI/CD
-
-O projeto usa GitHub Actions para integração contínua. A cada push ou pull request, o código é automaticamente compilado e testado em ambiente Ubuntu.
 
 ## 📖 Documentação
 

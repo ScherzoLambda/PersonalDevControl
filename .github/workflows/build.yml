@@ -1,8 +1,6 @@
 name: Build Qt C++ App
 
 on:
-#  push:
-#    branches: ['**']
   pull_request:
     branches: ['**']
   workflow_dispatch:
@@ -10,21 +8,53 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt update
+          sudo apt install -y \
             build-essential \
             cmake \
             ninja-build \
-            libcurl4-openssl-dev \
-            pkg-config
+            pkg-config \
+            libssl-dev \
+            libsasl2-dev \
+            libsnappy-dev \
+            zlib1g-dev \
+            git
 
+      #############################
+      # Install mongo-c-driver
+      #############################
+      - name: Install mongo-c-driver (C driver)
+        run: |
+          git clone --branch 2.1.2 https://github.com/mongodb/mongo-c-driver.git
+          cd mongo-c-driver
+          mkdir build && cd build
+          cmake .. -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release
+          sudo cmake --build . --target install -j$(nproc)
+          sudo ldconfig
+
+      #############################
+      # Install mongo-cxx-driver
+      #############################
+      - name: Install mongo-cxx-driver (C++ driver)
+        run: |
+          git clone --branch r3.10.0 https://github.com/mongodb/mongo-cxx-driver.git
+          cd mongo-cxx-driver
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local
+          sudo cmake --build . --target install -j$(nproc)
+          sudo ldconfig
+
+      #############################
+      # Install Qt
+      #############################
       - name: Set up Qt
         uses: jurplel/install-qt-action@v3
         with:
@@ -34,29 +64,37 @@ jobs:
           arch: 'gcc_64'
           cache: true
 
+      #############################
+      # Build CMake project
+      #############################
       - name: Configure CMake
         run: |
           mkdir build
           cd build
-          echo "Qt6_DIR: $Qt6_DIR"
-          echo "CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$Qt6_DIR"
+
+          echo "Qt6_DIR=$Qt6_DIR"
+          echo "Prefix: /usr/local"
+
+          cmake .. -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$Qt6_DIR;/usr/local"
 
       - name: Build
         run: |
           cd build
           cmake --build . --config Release --verbose
 
+      #############################
+      # Test Artifact
+      #############################
       - name: Test build artifacts
         run: |
           cd build
-          ls -la
           ls -la bin/
-          # Check if executable was created
+
           if [ -f ./bin/PersonalDevControl ]; then
-            echo "✅ PersonalDevControl executable created successfully"
-            file ./bin/PersonalDevControl
+            echo "✅ Build OK — PersonalDevControl found"
           else
-            echo "❌ PersonalDevControl executable not found"
+            echo "❌ Build failed — PersonalDevControl NOT found"
             exit 1
           fi
