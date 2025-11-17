@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QMessageBox>
 #include <QFormLayout>
+
 LoginWindow::LoginWindow(QWidget* parent) :
     QFrame(parent),
     ui(new Ui::LoginTasks)
@@ -122,7 +123,7 @@ void LoginWindow::onLoginButtonClicked()
         if (logresult != nullDoc && checkresult(logresult, username.toStdString()) == 1) {
             QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo");
             emit loginSuccessful(QString::fromStdString(logresult));
-            // Hide the login window (optional)
+  
             this->hide();
         }
         else {
@@ -133,6 +134,6 @@ void LoginWindow::onLoginButtonClicked()
     }
     else {
         // Show error message
-        QMessageBox::warning(this, "Login Failed", "H� campos vazios");
+        QMessageBox::warning(this, "Login Failed", "Há campos vazios");
     }
 }
