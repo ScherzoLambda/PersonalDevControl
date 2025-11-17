@@ -5,10 +5,23 @@ project(PersonalDevControl VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#
+# Garante que o CMake procure pacotes APENAS em /usr/local
+#
+set(CMAKE_PREFIX_PATH "/usr/local")
+set(CMAKE_LIBRARY_PATH "/usr/local/lib")
+set(CMAKE_INCLUDE_PATH "/usr/local/include")
+
+#
+# Encontrar Qt e MongoDB C++ Drivers
+#
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
 
+#
+# Fontes
+#
 set(SOURCES
         src/main.cpp
         src/ui/personaldevcontrol.cpp
@@ -30,7 +43,12 @@ set(UI_FILES
         src/ui/loginMongo.ui
 )
 
-qt_add_executable(PersonalDevControl ${SOURCES} ${HEADERS} ${UI_FILES} resources/personaldevcontrol.qrc)
+qt_add_executable(PersonalDevControl
+        ${SOURCES}
+        ${HEADERS}
+        ${UI_FILES}
+        resources/personaldevcontrol.qrc
+)
 
 set_target_properties(PersonalDevControl PROPERTIES
         AUTORCC ON
@@ -38,6 +56,9 @@ set_target_properties(PersonalDevControl PROPERTIES
         AUTOMOC ON
 )
 
+#
+# Linkagem somente com as bibliotecas do /usr/local/lib
+#
 target_link_libraries(PersonalDevControl PRIVATE
         Qt6::Core
         Qt6::Widgets
@@ -46,15 +67,22 @@ target_link_libraries(PersonalDevControl PRIVATE
         mongo::bsoncxx_shared
 )
 
+#
+# Includes
+#
 target_include_directories(PersonalDevControl PRIVATE
-        .                        # Root directory for ui_loginMongo.h
+        .
         src
         src/ui
         src/core
         src/models
-        ${CMAKE_CURRENT_BINARY_DIR}  # For generated UI headers
+        ${CMAKE_CURRENT_BINARY_DIR}
+        /usr/local/include
 )
 
+#
+# Output do executável
+#
 set_target_properties(PersonalDevControl PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )

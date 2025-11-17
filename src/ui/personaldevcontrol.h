@@ -21,6 +21,7 @@ public:
     void updateClock();
     void stopTimer();
     void startTimer();
+    void onStopButtonClicked();
 
 public slots:
     void onLoginSuccessful(const QString& logresult);

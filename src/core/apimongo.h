@@ -19,7 +19,7 @@ public:
     std::string do_insertMany();
     std::string do_find(const string& collection = "base0");
     std::string do_findOne(const std::string& filter, const string& collection = "base0");
-    std::string do_update(const std::string& filter, const std::string& up_data);
+    std::string do_update(const std::string& filter, const std::string& up_data, const string& collection);
     std::string do_updateMany(const std::string& filter, const std::string& up_data);
     std::string do_deleteMany(const std::string& filter);
     std::string do_delete(const std::string& filter);

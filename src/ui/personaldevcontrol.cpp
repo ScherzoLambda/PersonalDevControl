@@ -26,8 +26,20 @@ PersonalDevControl::~PersonalDevControl()
     delete ui;
 }
 
+// TODO: Melhorar o sistema de login
+// TODO: Melhorar o sistema de logout
+// TODO: Melhorar estrutura do código
+// TODO: Melhorar o salvamento dos dados do usuário logado
+// TODO: Melhorar a segurança dos dados
+// TODO: Melhorar interface login
+// TODO: Melhorar interface mainwindow
+// TODO: Implementar tela de vizualização das tarefas
+// TODO: Implementar tela de adição/remoção/edição de tarefas, bem como
+// iniciar uma tarefa específica e associar o tempo gasto a ela.
+
 void PersonalDevControl::onLoginSuccessful(const QString& logresult) {
     userInfo = logresult; // Armazena a informa��o do login
+    cout << "Login realizado com sucesso. " << userInfo.toStdString() << endl;
 }
 
 void PersonalDevControl::sendbtn_clicked()
@@ -56,10 +68,12 @@ void PersonalDevControl::startTimer()
 void PersonalDevControl::stopTimer()
 {
     timer->stop();
+    this->onStopButtonClicked();
     ui->stopButton->setEnabled(false);
     ui->stopButton->setStyleSheet("background-color: rgb(221, 160, 221);color: rgb(255, 255, 255); ");
     ui->startButton->setEnabled(true);
     ui->startButton->setStyleSheet("background-color: rgb(128,0,128);color: rgb(255, 255, 255); ");
+    
 }
 
 void PersonalDevControl::updateTime()
@@ -72,4 +86,20 @@ void PersonalDevControl::updateClock() {
     QDateTime currentTime = QDateTime::currentDateTime();
     QString currentTimeStr = currentTime.toString("hh:mm:ss");
     ui->clock_label->setText("Hora atual: " + currentTimeStr);
+}
+
+void PersonalDevControl::onStopButtonClicked()
+{
+    // atualizar documento no mongo com o tempo decorrido
+    string filter = "{\"email\":\"" + userInfo.section('"', 3, 3).toStdString() + "\"}";
+    string up_data = "{\"$set\":{\"total_time\":\"" + ui->hora_label->text().toStdString() + "\"}}";
+    string status_update = API_Client.do_update(filter, up_data, "users_1");   
+    if (status_update != "0") {
+        ui->textEdit->setText(QString::fromStdString(status_update));
+        cout << "Tempo atualizado no servidor: " << ui->hora_label->text().toStdString() << endl;
+    }
+    else {
+        ui->textEdit->setText("Falha ao atualizar o tempo no servidor.");
+        cout << "Falha ao atualizar o tempo no servidor." << endl;
+    }
 }

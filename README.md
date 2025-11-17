@@ -138,7 +138,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 ## 👥 Autores
 
-- **ScherzoLambda** - *Trabalho inicial* - [ScherzoLambda](https://github.com/ScherzoLambda)
+- **ScherzoLambda** - *WIP* - [ScherzoLambda](https://github.com/ScherzoLambda)
 
 ## 🙏 Agradecimentos
 
