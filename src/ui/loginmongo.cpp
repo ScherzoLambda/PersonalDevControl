@@ -4,6 +4,7 @@
 #include <models/modelUser.hpp>
 #include <iostream>
 #include <QMessageBox>
+#include <QTimer>
 #include <QFormLayout>
 
 LoginWindow::LoginWindow(QWidget* parent) :
@@ -12,9 +13,13 @@ LoginWindow::LoginWindow(QWidget* parent) :
 {
     ui->setupUi(this);
 
+    ui->pushButton->setAutoDefault(true);
     // Connect the login button clicked signal to the slot
     connect(ui->pushButton, &QPushButton::clicked, this, &LoginWindow::onLoginButtonClicked);
     connect(ui->pushButton_2, &QPushButton::clicked, this, &LoginWindow::onRegisterButtonClicked);
+    connect(ui->lineEdit, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
+    connect(ui->lineEdit_2, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
+
 }
 
 LoginWindow::~LoginWindow()
@@ -34,6 +39,20 @@ int LoginWindow::checkresult(const string& data_result, const string& valuate)
         //std::cout << "Email n�o encontrado." << std::endl;
     }
 }
+
+/*
+*/
+// void LoginWindow::keyPressEvent(QKeyEvent *event)
+// {
+//     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+//         ui->pushButton->click();  // aciona login
+//         return;
+//     }
+
+//     QFrame::keyPressEvent(event);
+// }
+
+
 
 void LoginWindow::onRegisterButtonClicked()
 {
@@ -89,8 +108,17 @@ void LoginWindow::onRegisterButtonClicked()
             return;
         }
 
-        string hashedPassword = ModelUser::criptPassword(password);
-        string status_register = API_Client.do_insert(ModelUser::document_user(name.toStdString(),email.toStdString(), hashedPassword,""),"users_1");
+        User u;
+        u.nome = name.toStdString();
+        u.email = email.toStdString();
+        u.senha = ModelUser::criptPassword(password);
+        u.horas_trabalhadas = "";
+
+        string jsonDoc = ModelUser::document_user(u);
+
+        // Enviar para API
+        string status_register = API_Client.do_insert(jsonDoc, "users_1");
+
         if (status_register != "0") {
             QMessageBox::information(&registrationDialog, "Sucesso",QString::fromStdString(status_register));
             registrationDialog.close();
@@ -116,18 +144,34 @@ void LoginWindow::onLoginButtonClicked()
     QString password = ui->lineEdit_2->text();
     string nullDoc = " {\"document\":null}";
 
-    // For demonstration, let's assume any non-empty username and password is valid
+
+
     if (!username.isEmpty() && !password.isEmpty()) {
-        string hashedPassword = ModelUser::criptPassword(password);
-        string logresult = API_Client.do_findOne(ModelUser::login_filter(username.toStdString(), hashedPassword), "users_1");
-        if (logresult != nullDoc && checkresult(logresult, username.toStdString()) == 1) {
-            QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo");
-            emit loginSuccessful(QString::fromStdString(logresult));
+        string senhaHash = ModelUser::criptPassword(password);
+
+        string jsonFilter = ModelUser::login_filter(username.toStdString(), senhaHash);
+
+        string result = API_Client.do_findOne(jsonFilter, "users_1");
+        if (result != nullDoc && checkresult(result, username.toStdString()) == 1) {
+            // QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo");
+            QMessageBox *msg = new QMessageBox(this);
+            msg->setWindowTitle("Login bem-sucedido");
+            msg->setText("Seja Bem-Vindo");
+            msg->setIcon(QMessageBox::Information);
+            msg->setStandardButtons(QMessageBox::NoButton);
+            msg->show();
+            QTimer::singleShot(1100, msg, [msg](){
+                msg->close();
+                msg->deleteLater();
+            });
+
+            emit loginSuccessful(QString::fromStdString(result));
   
-            this->hide();
+            // this->hide();
+            this->close();
         }
         else {
-            QMessageBox::warning(this, "Login Failed", "Invalid username or password" + QString::fromStdString(logresult));
+            QMessageBox::warning(this, "Login Failed", "Invalid username or password" + QString::fromStdString(result));
         }
         
 

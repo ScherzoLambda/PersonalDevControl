@@ -2,6 +2,7 @@
 #include <core/apimongo.hpp>
 #include <string>
 #include <QtWidgets/QFrame>
+#include <QtGui/QKeyEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LoginTasks; }
@@ -15,6 +16,9 @@ public:
     explicit LoginWindow(QWidget* parent = nullptr);
     ~LoginWindow();
     int checkresult(const std::string& data_result, const std::string& valuate);
+
+// protected:
+//     void keyPressEvent(QKeyEvent *event) override;
 
 signals:
     void loginSuccessful(const QString& logresult);

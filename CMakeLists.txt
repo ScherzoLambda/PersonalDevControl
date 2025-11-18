@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Automação Qt
 set(CMAKE_AUTOMOC ON)
@@ -26,6 +27,7 @@ qt_add_executable(PersonalDevControl
     resources/personaldevcontrol.qrc
 )
 
+target_link_libraries(ui_module PUBLIC nlohmann_json::nlohmann_json)
 # Linkagem dos módulos
 target_link_libraries(PersonalDevControl PRIVATE
     Qt6::Core
