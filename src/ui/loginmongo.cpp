@@ -1,7 +1,7 @@
-#include "loginmongo.h"
-#include "../core/apimongo.h"
-#include "../models/modelTask.h"
-#include "ui_loginMongo.h"
+#include <ui/loginmongo.hpp>
+#include "ui_LoginTasks.h"
+#include <core/apimongo.hpp>
+#include <models/modelUser.hpp>
 #include <iostream>
 #include <QMessageBox>
 #include <QFormLayout>
@@ -89,8 +89,8 @@ void LoginWindow::onRegisterButtonClicked()
             return;
         }
 
-        string hashedPassword = ModelTask::criptPassword(password);
-        string status_register = API_Client.do_insert(ModelTask::document_user(name.toStdString(),email.toStdString(), hashedPassword,""),"users_1");
+        string hashedPassword = ModelUser::criptPassword(password);
+        string status_register = API_Client.do_insert(ModelUser::document_user(name.toStdString(),email.toStdString(), hashedPassword,""),"users_1");
         if (status_register != "0") {
             QMessageBox::information(&registrationDialog, "Sucesso",QString::fromStdString(status_register));
             registrationDialog.close();
@@ -118,8 +118,8 @@ void LoginWindow::onLoginButtonClicked()
 
     // For demonstration, let's assume any non-empty username and password is valid
     if (!username.isEmpty() && !password.isEmpty()) {
-        string hashedPassword = ModelTask::criptPassword(password);
-        string logresult = API_Client.do_findOne(ModelTask::login_filter(username.toStdString(), hashedPassword), "users_1");
+        string hashedPassword = ModelUser::criptPassword(password);
+        string logresult = API_Client.do_findOne(ModelUser::login_filter(username.toStdString(), hashedPassword), "users_1");
         if (logresult != nullDoc && checkresult(logresult, username.toStdString()) == 1) {
             QMessageBox::information(this, "Login bem-sucedido", "Seja Bem-Vindo");
             emit loginSuccessful(QString::fromStdString(logresult));

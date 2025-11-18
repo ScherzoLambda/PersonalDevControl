@@ -1,8 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include <QMessageBox>
-#include "apimongo.h"
+#include <core/apimongo.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/basic/document.hpp>

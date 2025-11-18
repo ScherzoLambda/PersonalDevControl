@@ -1,5 +1,6 @@
-#include "personaldevcontrol.h"
-#include "../core/apimongo.h"
+#include <ui/personaldevcontrol.hpp>
+#include "ui_personaldevcontrol.h"
+#include <core/apimongo.hpp>
 #include <QDateTime>
 #include <QTimer>
 
